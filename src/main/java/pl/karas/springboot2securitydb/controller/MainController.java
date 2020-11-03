@@ -1,24 +1,23 @@
 package pl.karas.springboot2securitydb.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import pl.karas.springboot2securitydb.repository.AppUser;
-import pl.karas.springboot2securitydb.repository.AppUserRepo;
+import pl.karas.springboot2securitydb.repository.entity.AppUser;
+import pl.karas.springboot2securitydb.service.UserDetailsServiceImpl;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class MainController {
 
-    private AppUserRepo appUserRepo;
-    private PasswordEncoder passwordEncoder;
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
-    public MainController(AppUserRepo appUserRepo,
-                          PasswordEncoder passwordEncoder) {
-        this.appUserRepo = appUserRepo;
-        this.passwordEncoder = passwordEncoder;
+    public MainController(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @RequestMapping("/login")
@@ -32,9 +31,14 @@ public class MainController {
     }
 
     @RequestMapping("/register")
-    public ModelAndView register(AppUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        appUserRepo.save(user);
+    public ModelAndView register(AppUser user, HttpServletRequest request) {
+        userDetailsService.addNewUser(user, request);
+        return new ModelAndView("redirect:/login");
+    }
+
+    @RequestMapping("/verify-token")
+    public ModelAndView verifyToken(@RequestParam String token) {
+        userDetailsService.verifyToken(token);
         return new ModelAndView("redirect:/login");
     }
 

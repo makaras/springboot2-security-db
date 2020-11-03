@@ -1,4 +1,4 @@
-package pl.karas.springboot2securitydb.repository;
+package pl.karas.springboot2securitydb.repository.entity;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,6 +19,7 @@ public class AppUser implements UserDetails {
     private Long id;
     private String username;
     private String password;
+    private boolean isEnabled;
 
     public Long getId() {
         return id;
@@ -44,6 +45,10 @@ public class AppUser implements UserDetails {
         this.password = password;
     }
 
+    public void setEnabled(boolean enabled) {
+        isEnabled = enabled;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
@@ -66,6 +71,6 @@ public class AppUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 }
